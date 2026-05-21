@@ -15,6 +15,7 @@ const BinarySearch = () => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [message, setMessage] = useState("");
   const [speed, setSpeed] = useState(1);
+  const speedRef = useRef(1); // FIX: tracks current speed without closure issues
   const animationRef = useRef(null);
   const searchStateRef = useRef({ l: 0, h: 0, arr: [], targetValue: 0 });
   const formRef = useRef(null);
@@ -98,7 +99,7 @@ const BinarySearch = () => {
 
   const animateBinarySearch = () => {
     const { l, h, arr, targetValue } = searchStateRef.current;
-    const delay = 1500 / speed;
+    const delay = 1500 / speedRef.current; // FIX: read from ref so it always uses the latest speed
 
     if (l > h) {
       setMessage(`Element ${targetValue} not found in the array.`);
@@ -154,12 +155,21 @@ const BinarySearch = () => {
     }, delay);
   };
 
+  // FIX: sync speedRef alongside state so animateBinarySearch always reads the latest value
   const increaseSpeed = () => {
-    setSpeed((prev) => Math.min(prev + 0.5, 5));
+    setSpeed((prev) => {
+      const next = Math.min(prev + 0.5, 5);
+      speedRef.current = next;
+      return next;
+    });
   };
 
   const decreaseSpeed = () => {
-    setSpeed((prev) => Math.max(prev - 0.5, 0.5));
+    setSpeed((prev) => {
+      const next = Math.max(prev - 0.5, 0.5);
+      speedRef.current = next;
+      return next;
+    });
   };
 
   useEffect(() => {

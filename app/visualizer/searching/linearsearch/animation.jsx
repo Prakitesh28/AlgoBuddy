@@ -13,6 +13,7 @@ const LinearSearch = () => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [message, setMessage] = useState("");
   const [speed, setSpeed] = useState(1);
+  const speedRef = useRef(1); // FIX: tracks current speed without closure issues
   const animationRef = useRef(null);
   const formRef = useRef(null);
   const elementRefs = useRef([]);
@@ -82,7 +83,7 @@ const LinearSearch = () => {
 
   const animateLinearSearch = (arr, targetValue) => {
     let index = 0;
-    const delay = 1500 / speed;
+    // FIX: delay is no longer captured once here — it is read inside step() instead
 
     const step = () => {
       if (index >= arr.length) {
@@ -106,6 +107,8 @@ const LinearSearch = () => {
         }
       });
 
+      // FIX: read delay fresh on every step so speed changes take effect immediately
+      const delay = 1500 / speedRef.current;
       animationRef.current = setTimeout(() => {
         if (arr[index] === targetValue) {
           setFoundIndex(index);
@@ -122,8 +125,22 @@ const LinearSearch = () => {
     step();
   };
 
-  const increaseSpeed = () => setSpeed((prev) => Math.min(prev + 0.5, 5));
-  const decreaseSpeed = () => setSpeed((prev) => Math.max(prev - 0.5, 0.5));
+  // FIX: sync speedRef alongside state so animateLinearSearch always reads the latest value
+  const increaseSpeed = () => {
+    setSpeed((prev) => {
+      const next = Math.min(prev + 0.5, 5);
+      speedRef.current = next;
+      return next;
+    });
+  };
+
+  const decreaseSpeed = () => {
+    setSpeed((prev) => {
+      const next = Math.max(prev - 0.5, 0.5);
+      speedRef.current = next;
+      return next;
+    });
+  };
 
   return (
     <main className="container mx-auto">
