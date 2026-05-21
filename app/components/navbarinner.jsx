@@ -115,11 +115,7 @@ export default function Navbar() {
                     strokeWidth={2.5}
                     viewBox="0 0 24 24"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M19 9l-7 7-7-7"
-                    />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
                 {userMenuOpen && (
@@ -134,40 +130,17 @@ export default function Navbar() {
                       onClick={() => setUserMenuOpen(false)}
                       className="flex items-center gap-2.5 px-4 py-3 text-[14px] font-medium text-[#1a1a1a] dark:text-[#f5f5f5] hover:bg-[#f9fafb] dark:hover:bg-[#222] transition-colors"
                     >
-                      <svg
-                        className="w-4 h-4 text-[#6b7280]"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                        />
+                      <svg className="w-4 h-4 text-[#6b7280]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                       </svg>
                       My Dashboard
                     </Link>
                     <button
-                      onClick={() => {
-                        handleLogout();
-                        setUserMenuOpen(false);
-                      }}
+                      onClick={() => { handleLogout(); setUserMenuOpen(false); }}
                       className="w-full flex items-center gap-2.5 px-4 py-3 text-[14px] font-medium text-[#dc2626] hover:bg-[#fef2f2] dark:hover:bg-[#2a1515] transition-colors border-t border-[#f3f4f6] dark:border-[#222]"
                     >
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                        />
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                       </svg>
                       Log out
                     </button>
@@ -183,7 +156,7 @@ export default function Navbar() {
               </Link>
             )}
 
-            {/* Dark mode toggle */}
+            {/* Desktop Dark mode toggle */}
             <button
               onClick={toggleTheme}
               aria-label="Toggle theme"
@@ -195,7 +168,8 @@ export default function Navbar() {
                 </svg>
               ) : (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                  <circle cx="12" cy="12" r="5" /><path strokeLinecap="round" strokeLinejoin="round" d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+                  <circle cx="12" cy="12" r="5" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
                 </svg>
               )}
             </button>
@@ -208,32 +182,12 @@ export default function Navbar() {
             className="md:hidden w-10 h-10 flex items-center justify-center text-[#4b5563] dark:text-[#a3a3a3] rounded-lg hover:bg-[#f3f4f6] dark:hover:bg-[#222] transition-colors"
           >
             {menuOpen ? (
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             ) : (
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             )}
           </button>
@@ -262,9 +216,9 @@ export default function Navbar() {
               </Link>
             ))}
           </div>
-          <div className="px-6 py-4 border-t border-[#e5e7eb] dark:border-[#222]">
+          <div className="px-6 py-4 border-t border-[#e5e7eb] dark:border-[#222] flex flex-col gap-3">
             {user ? (
-              <div className="flex flex-col gap-2">
+              <>
                 <p className="text-[13px] text-[#6b7280] dark:text-[#737373] truncate pb-1">
                   {user.email}
                 </p>
@@ -281,7 +235,7 @@ export default function Navbar() {
                 >
                   Log out
                 </button>
-              </div>
+              </>
             ) : (
               <Link
                 href="/login"
@@ -291,6 +245,30 @@ export default function Navbar() {
                 Sign in
               </Link>
             )}
+
+            {/* Mobile Dark mode toggle */}
+            <button
+              onClick={() => { toggleTheme(); setMenuOpen(false); }}
+              aria-label="Toggle theme"
+              className="h-[44px] w-full flex items-center justify-center gap-2 text-[15px] font-semibold text-[#4b5563] dark:text-[#a3a3a3] border border-[#d1d5db] dark:border-[#444] rounded-full hover:border-[#a435f0] hover:text-[#a435f0] transition-all"
+            >
+              {theme === "light" ? (
+                <>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+                  </svg>
+                  Dark Mode
+                </>
+              ) : (
+                <>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="5" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+                  </svg>
+                  Light Mode
+                </>
+              )}
+            </button>
           </div>
         </div>
       )}
