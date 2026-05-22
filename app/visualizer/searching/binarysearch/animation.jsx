@@ -4,11 +4,12 @@ import { gsap } from "gsap";
 import ResetButton from "@/app/components/ui/resetButton";
 import GoButton from "@/app/components/ui/goButton";
 
-import {
-  saveToStorage,
-  loadFromStorage,
-  removeFromStorage,
-} from "@/utils/storage";
+const getFontSize = (value) => {
+  const len = String(value).length;
+  if (len <= 2) return "text-lg";
+  if (len === 3) return "text-sm";
+  return "text-xs";
+};
 
 const BinarySearch = () => {
   const [arrayElements, setArrayElements] = useState(() =>
@@ -410,10 +411,8 @@ const BinarySearch = () => {
                   className="flex flex-col items-center"
                 >
                   <div
-                    ref={(el) =>
-                      (elementRefs.current[index] = el)
-                    }
-                    className={`w-16 h-16 flex items-center justify-center rounded-lg border-2 transition-all duration-300 text-lg font-medium ${
+                    ref={(el) => (elementRefs.current[index] = el)}
+                    className={`w-16 h-16 flex items-center justify-center rounded-lg border-2 transition-all duration-300 ${getFontSize(element)} font-medium ${
                       index === foundIndex
                         ? "bg-green-500 dark:bg-green-600 border-green-700 dark:border-green-400 text-gray-800 dark:text-white"
                         : index === mid
