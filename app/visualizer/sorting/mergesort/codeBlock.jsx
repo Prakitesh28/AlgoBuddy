@@ -305,11 +305,19 @@ int main(){
 }`,
 };
 
+const fileNames = {
+  javascript: 'mergeSort.js',
+  python: 'merge_sort.py',
+  java: 'MergeSort.java',
+  c: 'merge_sort.c',
+  cpp: 'merge_sort.cpp',
+};
+
 const MergeSortCode = () => (
   <CodeBlock
-    variant="standard"
-    title="Merge Sort Implementation"
+    variant="macos"
     codeExamples={codeExamples}
+    fileNames={fileNames}
   />
 );
 

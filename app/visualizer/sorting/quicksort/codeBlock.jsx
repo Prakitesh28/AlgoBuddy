@@ -283,11 +283,19 @@ int main(){
 }`,
 };
 
+const fileNames = {
+  javascript: 'quickSort.js',
+  python: 'quick_sort.py',
+  java: 'QuickSort.java',
+  c: 'quick_sort.c',
+  cpp: 'quick_sort.cpp',
+};
+
 const QuickSortCode = () => (
   <CodeBlock
-    variant="standard"
-    title="Quick Sort Implementation"
+    variant="macos"
     codeExamples={codeExamples}
+    fileNames={fileNames}
   />
 );
 
