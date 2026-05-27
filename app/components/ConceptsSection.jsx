@@ -180,7 +180,7 @@ function AppMockup() {
 
   return (
     <div
-      className="w-full max-w-[320px] rounded-[2rem] bg-white shadow-2xl border border-surface-200 overflow-hidden"
+      className="w-full max-w-[320px] rounded-[2rem] bg-white shadow-2xl border border-surface-200 overflow-hidden transform-gpu will-change-transform transition-all duration-300 ease-in-out hover:-translate-y-1 hover:scale-[1.02] hover:bg-[#fbfffd] hover:border-[#86efac] hover:shadow-2xl hover:shadow-emerald-200/50"
     >
       {/* top bar */}
       <div className="flex items-center justify-between px-5 pt-5 pb-3">
@@ -284,10 +284,10 @@ export default function ConceptsSection() {
               </p>
               <Link
                 href={c.cta.href}
-                className="inline-flex items-center gap-2 h-[46px] px-7 rounded-full bg-white dark:bg-[#1a1a1a] text-[#1a1a1a] dark:text-white text-[15px] font-bold hover:bg-[#a435f0] dark:hover:bg-[#a435f0] dark:hover:text-white transition-all duration-200"
+                className="group inline-flex items-center gap-2 h-[52px] min-h-[44px] px-8 rounded-full bg-surface-900 dark:bg-white text-white dark:text-surface-900 text-[15px] font-bold hover:bg-primary dark:hover:bg-primary dark:hover:text-white active:scale-95 transition-all duration-200"
               >
                 {c.cta.label}
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
               </Link>
             </div>
           </div>
@@ -312,10 +312,10 @@ export default function ConceptsSection() {
             </p>
             <Link
               href="/visualizer"
-              className="inline-flex items-center gap-2 h-[46px] px-7 rounded-full bg-white dark:bg-[#1a1a1a] text-[#1a1a1a] dark:text-white text-[15px] font-bold hover:bg-[#a435f0] dark:hover:bg-[#a435f0] dark:hover:text-white transition-all duration-200"
+              className="group inline-flex items-center gap-2 h-[52px] min-h-[44px] px-8 rounded-full bg-surface-900 dark:bg-white text-white dark:text-surface-900 text-[15px] font-bold hover:bg-primary dark:hover:bg-primary dark:hover:text-white active:scale-95 transition-all duration-200"
             >
               Start learning
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
             </Link>
           </div>
 
