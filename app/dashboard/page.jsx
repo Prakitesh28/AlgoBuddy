@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase";
 import { useUser } from "@/app/contexts/UserContext";
 import Link from "next/link";
 import ActivityDashboard from "@/app/components/dashboard/ActivityDashboard";
+import PracticeStats from "@/app/components/dashboard/PracticeStats";
 import Footer from "@/app/components/footer";
 import { trackActivity } from "@/lib/activity";
 
@@ -81,8 +82,9 @@ export default function Dashboard() {
         )}
 
         {user && (
-          <div className="mb-8">
+          <div className="mb-8 space-y-8">
             <ActivityDashboard userId={user.id} />
+            <PracticeStats />
           </div>
         )}
 
