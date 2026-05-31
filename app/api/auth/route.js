@@ -11,8 +11,12 @@ import { verifyTurnstile } from "@/lib/verifyTurnstile";
 // so that Supabase's own per-user RLS applies from the first request.
 function getValidUrl(value) {
   if (!value) return null;
-  const trimmed = String(value).trim();
+  let trimmed = String(value).trim();
   if (!trimmed || trimmed.startsWith("Your ")) return null;
+  // Node 18+ fetch localhost IPv6 issue fix
+  if (trimmed.startsWith("http://localhost:")) {
+    trimmed = trimmed.replace("http://localhost:", "http://127.0.0.1:");
+  }
   try {
     const url = new URL(trimmed);
     return url.protocol === "http:" || url.protocol === "https:" ? trimmed : null;
@@ -208,12 +212,11 @@ export async function POST(req) {
         );
       }
 
-      const { error } = await supabaseAdmin.auth.signUp({
+      const { data: userData, error } = await supabaseAdmin.auth.admin.createUser({
         email,
         password,
-        options: {
-          data: { display_name: name },
-        },
+        email_confirm: true,
+        user_metadata: { display_name: name },
       });
 
       if (error) {
@@ -226,7 +229,7 @@ export async function POST(req) {
       return new Response(
         JSON.stringify({
           success: true,
-          message: "Signup successful. Verification email sent.",
+          message: "Signup successful. You can now log in!",
           trigger: true,
         }),
         { status: 200, headers: { "Content-Type": "application/json" } },
