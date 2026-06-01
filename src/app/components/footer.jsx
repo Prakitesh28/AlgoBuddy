@@ -143,9 +143,9 @@ const Footer = () => {
               <h3 className={footerHeading}>Quick Links</h3>
               <div className="space-y-4">
                 <Link href="/" className={footerLink}>Home</Link>
-                <Link href="/visualizations" className={footerLink}>Visualizations</Link>
-                <Link href="/data-structures" className={footerLink}>Data Structures</Link>
-                <Link href="/algorithms" className={footerLink}>Algorithms</Link>
+                <Link href="#" className={footerLink}>Visualizations</Link>
+                <Link href="#" className={footerLink}>Data Structures</Link>
+                <Link href="#" className={footerLink}>Algorithms</Link>
                 <Link href="/about" className={footerLink}>About Us</Link>
                 <Link href="/contactus" className={footerLink}>Contact Us</Link>
               </div>
@@ -155,12 +155,12 @@ const Footer = () => {
             <div>
               <h3 className={footerHeading}>Resources</h3>
               <div className="space-y-4">
-                <Link href="/tutorials" className={footerLink}>Tutorials</Link>
-                <Link href="/cheatsheets" className={footerLink}>Cheatsheets</Link>
-                <Link href="/practice" className={footerLink}>Practice Problems</Link>
-                <Link href="/roadmaps" className={footerLink}>Roadmaps</Link>
-                <Link href="/blog" className={footerLink}>Blog</Link>
-                <Link href="/faq" className={footerLink}>FAQ</Link>
+                <Link href="#" className={footerLink}>Tutorials</Link>
+                <Link href="#" className={footerLink}>Cheatsheets</Link>
+                <Link href="#" className={footerLink}>Practice Problems</Link>
+                <Link href="#" className={footerLink}>Roadmaps</Link>
+                <Link href="#" className={footerLink}>Blog</Link>
+                <Link href="#" className={footerLink}>FAQ</Link>
               </div>
             </div>
 
@@ -199,7 +199,7 @@ const Footer = () => {
                 <button onClick={() => setShowCookieModal(true)} className={footerLink}>
                   Cookies Policy
                 </button>
-                <Link href="/code-of-conduct" className={footerLink}>
+                <Link href="#" className={footerLink}>
                   Code of Conduct
                 </Link>
               </div>
