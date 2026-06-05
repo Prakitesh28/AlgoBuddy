@@ -156,7 +156,7 @@ export default function Navbar() {
           {/* Desktop Links with Auth Interception */}
           <div className="hidden md:flex items-center gap-7">
             {NAV_LINKS.map((l) => {
-              const dynamicHref = l.href;
+              const dynamicHref = (l.href === "/arena" && !user) ? "/login" : l.href;
 
               return (
                 <Link
@@ -188,14 +188,14 @@ export default function Navbar() {
                   className="flex items-center gap-2 rounded-full px-3 py-1.5 border border-surface-200 dark:border-surface-700 hover:border-primary transition-colors focus-ring"
                 >
                   <Image
-                    src={`https://api.dicebear.com/8.x/initials/svg?seed=${encodeURIComponent(
+                    src={user.user_metadata?.avatar_url || user.user_metadata?.picture || `https://api.dicebear.com/8.x/initials/svg?seed=${encodeURIComponent(
                       user.email
                     )}`}
                     alt="avatar"
                     width={28}
                     height={28}
                     unoptimized
-                    className="w-7 h-7 rounded-full"
+                    className="w-7 h-7 rounded-full object-cover"
                   />
 
                   <ChevronDown className="w-3.5 h-3.5 text-surface-500" />
@@ -289,7 +289,7 @@ export default function Navbar() {
         >
           <div className="py-2">
             {NAV_LINKS.map((l) => {
-              const dynamicHref = l.href;
+              const dynamicHref = (l.href === "/arena" && !user) ? "/login" : l.href;
 
               return (
                 <Link
