@@ -384,7 +384,7 @@ export const bellmanFordFrames = (nodes, edges, startNode) => {
         negativeCycle: false,
         description: `Pass ${pass}: checking edge ${from} 2192 ${to} (weight: ${w})`,
       });
-      if (distances[from] !== Infinity 00260026 distances[from] + w < distances[to]) {
+      if (distances[from] !== Infinity && distances[from] + w < distances[to]) {
         distances[to] = distances[from] + w;
         anyUpdate = true;
         frames.push({
@@ -410,7 +410,7 @@ export const bellmanFordFrames = (nodes, edges, startNode) => {
     const { from, to, weight } = edge;
     const w = Number(weight) || 0;
     frames.push({ visitedNodes: new Set(), visitingNodes: new Set([from, to]), activeEdge: { from, to }, distances: { ...distances }, updatedNode: null, phase: "detecting", negativeCycle: false, description: `Negative cycle check: edge ${from} 2192 ${to}` });
-    if (distances[from] !== Infinity 00260026 distances[from] + w < distances[to]) {
+    if (distances[from] !== Infinity && distances[from] + w < distances[to]) {
       negativeCycle = true;
       frames.push({ visitedNodes: new Set(), visitingNodes: new Set([from, to]), activeEdge: { from, to }, distances: { ...distances }, updatedNode: to, phase: "detecting", negativeCycle: true, description: `26a0Fe0f Negative cycle detected! Edge ${from} 2192 ${to} still improves distance.` });
       break;
