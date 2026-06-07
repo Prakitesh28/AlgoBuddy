@@ -20,6 +20,7 @@ import GraphCanvas from "@/app/components/models/GraphCanvas";
 import AdjacencyPanel from "@/app/components/models/AdjacencyPanel";
 import PlaybackControls from "@/app/components/ui/PlaybackControls";
 import useVisualizerKeyboard from "@/app/hooks/useVisualizerKeyboard";
+import { CustomInputPanel } from "@/app/visualizer/components/CustomInputPanel";
 import { 
   bfsFrames, 
   dfsFrames, 
@@ -250,18 +251,59 @@ export default function GraphVisualizer({ algorithm = "bfs", startNode: initialS
   const [currentFrame, setCurrentFrame] = useState(0);
   const [isEditing, setIsEditing] = useState(true);
 
+  // Derived flags
   const isWeighted = weightedAlgorithms.has(algorithm);
   const isDirected = directedAlgorithms.has(algorithm);
 
+  // Handle edge weight updates from GraphCanvas
   const handleUpdateEdgeWeight = useCallback((edgeIdx, newWeight) => {
     setEdges((prev) =>
       prev.map((e, i) => (i === edgeIdx ? { ...e, weight: newWeight } : e))
     );
   }, []);
 
+  // When adding an edge, default weight = 1
   const handleAddEdge = useCallback((edge) => {
     setEdges((prev) => [...prev, { ...edge, weight: 1, directed: isDirected }]);
   }, [isDirected]);
+
+  const handleCustomGraphInput = useCallback((parsedEdges) => {
+    if (parsedEdges === null) {
+      setNodes(defaultGraphs[algorithm]?.nodes || []);
+      setEdges(defaultGraphs[algorithm]?.edges || []);
+    } else {
+      const nodeIds = Array.from(
+        new Set(parsedEdges.flatMap(e => [e.source, e.target]))
+      ).sort((a, b) => a - b);
+      
+      const centerX = 400;
+      const centerY = 250;
+      const radius = 180;
+      const numNodes = nodeIds.length;
+      
+      const newNodes = nodeIds.map((id, idx) => {
+        const angle = (idx * 2 * Math.PI) / (numNodes || 1);
+        return {
+          id: String(id),
+          x: Math.round(centerX + radius * Math.cos(angle)),
+          y: Math.round(centerY + radius * Math.sin(angle)),
+          label: !isNaN(Number(id)) ? String.fromCharCode(65 + (Number(id) % 26)) : String(id)
+        };
+      });
+
+      const newEdges = parsedEdges.map(e => ({
+        from: String(e.source),
+        to: String(e.target),
+        weight: e.weight,
+        directed: isDirected
+      }));
+
+      setNodes(newNodes);
+      setEdges(newEdges);
+    }
+    setCurrentFrame(0);
+    setIsPlaying(false);
+  }, [algorithm, isDirected]);
 
   const frames = useMemo(() => {
     const adj = {};
@@ -304,7 +346,7 @@ export default function GraphVisualizer({ algorithm = "bfs", startNode: initialS
   const togglePlay = () => {
     if (currentFrame === frames.length - 1) setCurrentFrame(0);
     setIsPlaying(prev => !prev);
-    setIsEditing(false);
+    setIsEditing(false); // If they press play/pause, it shouldn't be in edit mode
   };
 
   const reset = () => {
@@ -348,9 +390,15 @@ export default function GraphVisualizer({ algorithm = "bfs", startNode: initialS
       counter += 1;
       nextId = `${counter}`;
     }
+
     setNodes((current) => [
       ...current,
-      { id: nextId, x, y, label: String.fromCharCode(65 + (counter % 26)) },
+      {
+        id: nextId,
+        x,
+        y,
+        label: String.fromCharCode(65 + (counter % 26)),
+      },
     ]);
     setCurrentFrame(0);
     setIsPlaying(false);
@@ -364,6 +412,7 @@ export default function GraphVisualizer({ algorithm = "bfs", startNode: initialS
       window.alert("Please enter a valid numeric weight.");
       return;
     }
+
     setEdges((current) => [
       ...current,
       { from, to, weight, directed: isDirected },
@@ -371,12 +420,15 @@ export default function GraphVisualizer({ algorithm = "bfs", startNode: initialS
     setCurrentFrame(0);
     setIsPlaying(false);
   };
-
   const moveNode = (id, x, y) => {
-    setNodes((current) =>
-      current.map((node) => node.id === id ? { ...node, x, y } : node)
-    );
-  };
+  setNodes((current) =>
+    current.map((node) =>
+      node.id === id
+        ? { ...node, x, y }
+        : node
+    )
+  );
+};
 
   const removeNode = (id) => {
     setNodes((current) => current.filter((node) => node.id !== id));
@@ -418,12 +470,14 @@ export default function GraphVisualizer({ algorithm = "bfs", startNode: initialS
               {isEditing ? "Editing Mode" : "Visualization Mode"}
             </button>
 
+            {/* Weighted badge */}
             {isWeighted && (
               <span className="rounded-lg border border-yellow-500/30 bg-yellow-500/10 px-3 py-1.5 text-xs font-semibold text-yellow-600 dark:text-yellow-400">
                 Weighted
               </span>
             )}
 
+            {/* Directed badge */}
             {isDirected && (
               <span className="rounded-lg border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">
                 Directed
@@ -460,7 +514,7 @@ export default function GraphVisualizer({ algorithm = "bfs", startNode: initialS
                 )}
                 {currentFrameData.result && currentFrameData.result.length > 0 && (
                   <div className="flex items-center gap-2 rounded-lg bg-success/10 px-3 py-1.5 text-xs font-bold text-success">
-                    Order: {currentFrameData.result.join(" → ")}
+                    Order: {currentFrameData.result.join(" ??? ")}
                   </div>
                 )}
               </div>
@@ -487,6 +541,7 @@ export default function GraphVisualizer({ algorithm = "bfs", startNode: initialS
           className="w-full"
         />
 
+        {/* Controls Bar */}
         <PlaybackControls
           isPaused={!isPlaying}
           onTogglePlayPause={togglePlay}
@@ -571,53 +626,112 @@ export default function GraphVisualizer({ algorithm = "bfs", startNode: initialS
           </div>
         </div>
 
-        {/* Adjacency Panel */}
-        <div className="rounded-2xl border border-surface-200 bg-white p-5 shadow-sm dark:border-surface-800 dark:bg-surface-900">
+      {/* Adjacency Representation & Custom Input */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2 rounded-2xl border border-surface-200 bg-white p-5 shadow-sm dark:border-surface-800 dark:bg-surface-900">
           <h3 className="mb-4 text-sm font-bold text-surface-900 dark:text-white">Adjacency Representation</h3>
-          {showFloydMatrix && (
-            <div className="mb-4">
-              <h4 className="mb-2 text-[10px] font-bold uppercase tracking-wider text-surface-500">Floyd-Warshall Distance Matrix</h4>
+          <AdjacencyPanel
+            nodes={nodes}
+            edges={edges}
+            isDirected={isDirected}
+            isWeighted={isWeighted}
+          />
+          <div className="mt-4 space-y-4">
+            {showFloydMatrix && (
+              <div>
+                <h4 className="mb-2 text-[10px] font-bold uppercase tracking-wider text-surface-500">Floyd-Warshall Distance Matrix</h4>
+                <div className="overflow-auto rounded-lg bg-surface-50 p-3 font-mono text-[11px] dark:bg-surface-950">
+                  <table className="w-full border-collapse text-center">
+                    <thead>
+                      <tr>
+                        <th className="p-1"></th>
+                        {currentFrameData.matrixNodes.map((nodeId) => (
+                          <th
+                            key={nodeId}
+                            className={`p-1 ${
+                              currentFrameData.intermediate === nodeId
+                                ? "text-amber-600 dark:text-amber-300"
+                                : "text-primary"
+                            }`}
+                          >
+                            {nodeLabelById[nodeId]}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {currentFrameData.matrixNodes.map((rowId) => (
+                        <tr key={rowId}>
+                          <td className="p-1 font-bold text-primary">{nodeLabelById[rowId]}</td>
+                          {currentFrameData.matrixNodes.map((colId) => {
+                            const isFocus = currentFrameData.row === rowId && currentFrameData.col === colId;
+                            const isUpdated =
+                              currentFrameData.updatedCell?.row === rowId &&
+                              currentFrameData.updatedCell?.col === colId;
+                            const value = currentFrameData.matrix[rowId][colId];
+                            return (
+                              <td
+                                key={colId}
+                                className={`border border-surface-200 p-1 dark:border-surface-800 ${
+                                  isUpdated
+                                    ? "bg-success/20 text-success"
+                                    : isFocus
+                                      ? "bg-primary/10 text-primary"
+                                      : ""
+                                }`}
+                              >
+                                {value === Infinity ? "INF" : value}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+            <div>
+              <h4 className="mb-2 text-[10px] font-bold uppercase tracking-wider text-surface-500">Adjacency List</h4>
+              <div className="max-h-64 overflow-auto rounded-lg bg-surface-50 p-3 font-mono text-[11px] dark:bg-surface-950">
+                {nodes.map(node => {
+                  const neighbors = edges
+                    .filter(e => e.from === node.id || (!e.directed && e.to === node.id))
+                    .map(e => {
+                      const neighbor = e.from === node.id ? e.to : e.from;
+                      const label = nodeLabelById[neighbor] || neighbor;
+                      return isWeighted ? `${label}(${e.weight})` : label;
+                    });
+                  return (
+                    <div key={node.id} className="mb-1">
+                      <span className="text-primary font-bold">{node.label}</span>: [{neighbors.join(", ")}]
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            <div>
+              <h4 className="mb-2 text-[10px] font-bold uppercase tracking-wider text-surface-500">Adjacency Matrix</h4>
               <div className="overflow-auto rounded-lg bg-surface-50 p-3 font-mono text-[11px] dark:bg-surface-950">
                 <table className="w-full border-collapse text-center">
                   <thead>
                     <tr>
                       <th className="p-1"></th>
-                      {currentFrameData.matrixNodes.map((nodeId) => (
-                        <th
-                          key={nodeId}
-                          className={`p-1 ${
-                            currentFrameData.intermediate === nodeId
-                              ? "text-amber-600 dark:text-amber-300"
-                              : "text-primary"
-                          }`}
-                        >
-                          {nodeLabelById[nodeId]}
-                        </th>
-                      ))}
+                      {nodes.map(n => <th key={n.id} className="p-1 text-primary">{n.label}</th>)}
                     </tr>
                   </thead>
                   <tbody>
-                    {currentFrameData.matrixNodes.map((rowId) => (
-                      <tr key={rowId}>
-                        <td className="p-1 font-bold text-primary">{nodeLabelById[rowId]}</td>
-                        {currentFrameData.matrixNodes.map((colId) => {
-                          const isFocus = currentFrameData.row === rowId && currentFrameData.col === colId;
-                          const isUpdated =
-                            currentFrameData.updatedCell?.row === rowId &&
-                            currentFrameData.updatedCell?.col === colId;
-                          const value = currentFrameData.matrix[rowId][colId];
+                    {nodes.map(row => (
+                      <tr key={row.id}>
+                        <td className="p-1 font-bold text-primary">{row.label}</td>
+                        {nodes.map(col => {
+                          const edge = edges.find(e => 
+                            (e.from === row.id && e.to === col.id) || 
+                            (!e.directed && ((e.from === row.id && e.to === col.id) || (e.from === col.id && e.to === row.id)))
+                          );
                           return (
-                            <td
-                              key={colId}
-                              className={`border border-surface-200 p-1 dark:border-surface-800 ${
-                                isUpdated
-                                  ? "bg-success/20 text-success"
-                                  : isFocus
-                                    ? "bg-primary/10 text-primary"
-                                    : ""
-                              }`}
-                            >
-                              {value === Infinity ? "INF" : value}
+                            <td key={col.id} className="border border-surface-200 p-1 dark:border-surface-800">
+                              {edge ? (isWeighted ? edge.weight : 1) : 0}
                             </td>
                           );
                         })}
@@ -627,14 +741,17 @@ export default function GraphVisualizer({ algorithm = "bfs", startNode: initialS
                 </table>
               </div>
             </div>
-          )}
-          <AdjacencyPanel
-            nodes={nodes}
-            edges={edges}
-            isDirected={isDirected}
-            isWeighted={isWeighted}
+          </div>
+        </div>
+
+        <div className="lg:col-span-1">
+          <CustomInputPanel
+            inputType="graph"
+            onApply={handleCustomGraphInput}
+            currentData={edges}
           />
         </div>
+      </div>
       </div>
     </div>
   );

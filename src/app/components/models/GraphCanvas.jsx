@@ -1,4 +1,4 @@
-// app/components/models/GraphCanvas.jsx
+// src/app/components/models/GraphCanvas.jsx
 "use client";
 import { useRef, useState, useCallback } from "react";
 
