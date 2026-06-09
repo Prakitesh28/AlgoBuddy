@@ -20,7 +20,12 @@ export default function PracticeSidebar({
   activeView, 
   onViewChange, 
   solvedCount = 8, 
-  dailyGoal = 15,
+  dailySolved = 0,
+  weeklySolved = 0,
+  monthlySolved = 0,
+  dailyGoal = 3,
+  weeklyGoal = 10,
+  monthlyGoal = 50,
   streakDays = 0,
   bestStreak = 0,
   onBackToPractice
@@ -33,7 +38,9 @@ export default function PracticeSidebar({
     { id: "recent-solved", label: "Recent Solved", icon: History },
   ];
 
-  const dailyGoalPercentage = Math.min(100, Math.round((solvedCount / dailyGoal) * 100));
+  const dailyGoalPercentage = Math.min(100, Math.round((dailySolved / dailyGoal) * 100) || 0);
+  const weeklyGoalPercentage = Math.min(100, Math.round((weeklySolved / weeklyGoal) * 100) || 0);
+  const monthlyGoalPercentage = Math.min(100, Math.round((monthlySolved / monthlyGoal) * 100) || 0);
 
   return (
     <aside className="w-full lg:w-[260px] flex-shrink-0 flex flex-col gap-6 select-none">
@@ -82,7 +89,7 @@ export default function PracticeSidebar({
               </span>
               <div className="flex items-baseline gap-1 mt-0.5">
                 <span className="text-xl font-black text-slate-800 dark:text-white">
-                  {solvedCount}/{dailyGoal}
+                  {dailySolved}/{dailyGoal}
                 </span>
                 <span className="text-xs text-slate-400 dark:text-neutral-500 font-semibold">
                   Problems Solved
@@ -92,17 +99,72 @@ export default function PracticeSidebar({
           </div>
 
           {/* Progress bar */}
-          <div className="w-full bg-slate-100 dark:bg-neutral-800 h-2 rounded-full overflow-hidden mb-4">
+          <div className="w-full bg-slate-100 dark:bg-neutral-800 h-2 rounded-full overflow-hidden">
             <div 
               className="bg-primary h-full rounded-full transition-all duration-500" 
               style={{ width: `${dailyGoalPercentage}%` }}
             />
           </div>
+        </div>
 
-          <button className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-slate-50 hover:bg-slate-100 dark:bg-neutral-800/50 dark:hover:bg-neutral-850 text-slate-600 dark:text-neutral-300 rounded-xl text-xs font-bold transition shadow-sm">
-            <span>View Progress</span>
-            <ChevronRight size={14} />
-          </button>
+        {/* Weekly Goal Card */}
+        <div className="flex-1 bg-white dark:bg-[#1a1b1e] border border-slate-100 dark:border-neutral-800/80 rounded-2xl p-5 shadow-sm">
+          <div className="flex items-center gap-3 mb-4.5">
+            <div className="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center">
+              <Layers size={18} />
+            </div>
+            <div>
+              <span className="text-[10px] font-black text-slate-400 dark:text-neutral-500 uppercase tracking-widest block">
+                Weekly Goal
+              </span>
+              <div className="flex items-baseline gap-1 mt-0.5">
+                <span className="text-xl font-black text-slate-800 dark:text-white">
+                  {weeklySolved}/{weeklyGoal}
+                </span>
+                <span className="text-xs text-slate-400 dark:text-neutral-500 font-semibold">
+                  Problems Solved
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Progress bar */}
+          <div className="w-full bg-slate-100 dark:bg-neutral-800 h-2 rounded-full overflow-hidden">
+            <div 
+              className="bg-purple-500 h-full rounded-full transition-all duration-500" 
+              style={{ width: `${weeklyGoalPercentage}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Monthly Goal Card */}
+        <div className="flex-1 bg-white dark:bg-[#1a1b1e] border border-slate-100 dark:border-neutral-800/80 rounded-2xl p-5 shadow-sm">
+          <div className="flex items-center gap-3 mb-4.5">
+            <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center">
+              <Trophy size={18} />
+            </div>
+            <div>
+              <span className="text-[10px] font-black text-slate-400 dark:text-neutral-500 uppercase tracking-widest block">
+                Monthly Goal
+              </span>
+              <div className="flex items-baseline gap-1 mt-0.5">
+                <span className="text-xl font-black text-slate-800 dark:text-white">
+                  {monthlySolved}/{monthlyGoal}
+                </span>
+                <span className="text-xs text-slate-400 dark:text-neutral-500 font-semibold">
+                  Problems Solved
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Progress bar */}
+          <div className="w-full bg-slate-100 dark:bg-neutral-800 h-2 rounded-full overflow-hidden">
+            <div 
+              className="bg-blue-500 h-full rounded-full transition-all duration-500" 
+              style={{ width: `${monthlyGoalPercentage}%` }}
+            />
+          </div>
         </div>
 
         {/* Streak Card */}

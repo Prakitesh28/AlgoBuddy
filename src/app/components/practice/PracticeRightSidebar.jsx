@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import Image from "next/image";
 import { 
   Clock, 
@@ -23,6 +23,8 @@ export default function PracticeRightSidebar({
   companiesCount = 12,
   activityData = []
 }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   const percentage = useMemo(() => {
     if (total === 0) return 0;
     return Math.round((solved / total) * 100);
@@ -164,14 +166,19 @@ export default function PracticeRightSidebar({
       </div>
 
       {/* Activity Card */}
-      <div className="bg-white dark:bg-[#1a1b1e] border border-slate-100 dark:border-neutral-800/80 rounded-2xl p-5 shadow-sm">
+      <div className="bg-white dark:bg-[#1a1b1e] border border-slate-100 dark:border-neutral-800/80 rounded-2xl p-5 shadow-sm transition-all duration-300">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xs font-black text-slate-800 dark:text-neutral-200 uppercase tracking-widest">
             Activity
           </h3>
-          <button className="text-[11px] font-black text-primary hover:underline uppercase tracking-wider">
-            View All
-          </button>
+          {activityData.length > 0 && (
+            <button 
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="text-[11px] font-black text-primary hover:underline uppercase tracking-wider"
+            >
+              {isExpanded ? "View Less" : "View All"}
+            </button>
+          )}
         </div>
 
         <div className="flex flex-col gap-4">
@@ -180,7 +187,7 @@ export default function PracticeRightSidebar({
               No recent activity
             </div>
           ) : (
-            activityData.map((act, idx) => (
+            (isExpanded ? activityData : activityData.slice(0, 4)).map((act, idx) => (
               <div key={idx} className="flex items-center justify-between text-xs animate-in fade-in duration-200">
                 <div className="flex items-center gap-3">
                   <div className={`w-2.5 h-2.5 rounded-full ${act.statusColor}`} />

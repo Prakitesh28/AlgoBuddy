@@ -247,11 +247,28 @@ export default function PracticePage() {
     let mediumTotal = 0;
     let hardTotal = 0;
     const uniqueCompanies = new Set();
+    
+    let dailySolved = 0;
+    let weeklySolved = 0;
+    let monthlySolved = 0;
+    const now = new Date();
+    const oneDayMs = 24 * 60 * 60 * 1000;
+    const sevenDaysMs = 7 * oneDayMs;
+    const thirtyDaysMs = 30 * oneDayMs;
 
     allProblems.forEach((prob) => {
-      const status = getStatus(prob.id);
+      const val = progress[prob.id];
+      const status = typeof val === "string" ? val : (val?.status || "Not Started");
+      
       if (status === "Completed") {
         solved++;
+        if (val && typeof val === "object" && val.updatedAt) {
+          const updatedDate = new Date(val.updatedAt);
+          const diffMs = now - updatedDate;
+          if (diffMs <= oneDayMs) dailySolved++;
+          if (diffMs <= sevenDaysMs) weeklySolved++;
+          if (diffMs <= thirtyDaysMs) monthlySolved++;
+        }
       } else if (status === "In Progress") {
         attempted++;
       }
@@ -279,6 +296,9 @@ export default function PracticePage() {
 
     return {
       solved,
+      dailySolved,
+      weeklySolved,
+      monthlySolved,
       attempted,
       remaining,
       total: allProblems.length,
@@ -300,6 +320,7 @@ export default function PracticePage() {
           counts[name] = (counts[name] || 0) + 1;
         });
       }
+
     });
     return Object.entries(counts).map(([name, count]) => ({ name, count }));
   }, [allProblems]);
@@ -375,8 +396,8 @@ export default function PracticePage() {
     // Sort by updatedAt descending
     activities.sort((a, b) => b.updatedAt - a.updatedAt);
 
-    // Take top 4
-    const topActivities = activities.slice(0, 4);
+    // Take top 10
+    const topActivities = activities.slice(0, 10);
 
     const now = new Date();
     return topActivities.map((act) => {
@@ -482,7 +503,12 @@ export default function PracticePage() {
             setSelectedCompanyFilter("All"); // Reset company filter
           }}
           solvedCount={stats.solved}
-          dailyGoal={15}
+          dailySolved={stats.dailySolved}
+          weeklySolved={stats.weeklySolved}
+          monthlySolved={stats.monthlySolved}
+          dailyGoal={3}
+          weeklyGoal={10}
+          monthlyGoal={50}
           streakDays={currentStreak}
           bestStreak={longestStreak}
           onBackToPractice={() => router.push("/")}

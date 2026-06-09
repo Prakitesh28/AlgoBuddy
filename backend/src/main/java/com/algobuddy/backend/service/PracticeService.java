@@ -30,8 +30,11 @@ public class PracticeService {
     public ProgressResponse getUserProgress(UUID userId) {
         List<UserProgress> progressList = progressRepository.findByUserId(userId);
         
-        Map<String, String> progressMap = progressList.stream()
-                .collect(Collectors.toMap(UserProgress::getProblemId, UserProgress::getStatus));
+        Map<String, ProgressResponse.ProgressDetail> progressMap = progressList.stream()
+                .collect(Collectors.toMap(
+                        UserProgress::getProblemId, 
+                        up -> new ProgressResponse.ProgressDetail(up.getStatus(), up.getUpdatedAt())
+                ));
 
         UserPracticeStats stats = statsRepository.findById(userId)
                 .orElse(new UserPracticeStats(userId, 0, 0, null, 0));
