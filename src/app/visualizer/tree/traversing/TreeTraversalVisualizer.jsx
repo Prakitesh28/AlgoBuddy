@@ -989,4 +989,3 @@ export default function TreeTraversalVisualizer({ initialMode = 'in-order' }) {
     </div>
   );
 }
-}
