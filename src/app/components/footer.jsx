@@ -15,7 +15,7 @@ import {
 
 import TermsOfServiceModal from '@/app/components/termsOfServicesModal'
 import CookiePolicyModal from '@/app/components/cookie'
-import CodeOfConductModel from '@/app/components/CodeOfConductModel'
+
 
 const Footer = () => {
   
