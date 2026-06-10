@@ -463,7 +463,6 @@ Please explain exactly what is happening in this step in detail.`;
 </div>
             </div>
           </div>
-        </div>
       
     </main>
   );
