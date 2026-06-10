@@ -10,6 +10,8 @@ import { createVisualizerPaths } from "@/app/visualizer/components/VisualizerPag
 import { generateInOrderSteps } from "@/features/algorithms/tree/inOrderLogic";
 import { generatePreOrderSteps } from "@/features/algorithms/tree/preOrderLogic";
 import { generateMorrisSteps } from "@/features/algorithms/tree/morrisLogic";
+import { generateLevelOrderSteps } from "@/features/algorithms/tree/levelOrderLogic";
+import { generatePostOrderSteps } from "@/features/algorithms/tree/postOrderLogic";
 
 class TreeNode {
   constructor(value) {
@@ -989,3 +991,4 @@ export default function TreeTraversalVisualizer({ initialMode = 'in-order' }) {
     </div>
   );
 }
+

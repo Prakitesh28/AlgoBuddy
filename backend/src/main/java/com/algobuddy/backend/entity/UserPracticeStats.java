@@ -36,5 +36,5 @@ public class UserPracticeStats {
 
     @Version
     @Column(name = "version")
-    private Integer version = 0;
+    private Integer version;
 }

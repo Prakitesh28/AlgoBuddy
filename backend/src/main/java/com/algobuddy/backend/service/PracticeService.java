@@ -1,5 +1,6 @@
 package com.algobuddy.backend.service;
 
+import com.algobuddy.backend.dto.BulkProgressRequest;
 import com.algobuddy.backend.dto.ProgressRequest;
 import com.algobuddy.backend.dto.ProgressResponse;
 import com.algobuddy.backend.entity.UserPracticeStats;
@@ -7,12 +8,16 @@ import com.algobuddy.backend.entity.UserProgress;
 import com.algobuddy.backend.repository.UserPracticeStatsRepository;
 import com.algobuddy.backend.repository.UserProgressRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import lombok.extern.slf4j.Slf4j;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
@@ -25,8 +30,13 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PracticeService {
 
+    private static final Logger log = LoggerFactory.getLogger(PracticeService.class);
+
     private final UserProgressRepository progressRepository;
     private final UserPracticeStatsRepository statsRepository;
+
+    @Autowired
+    private PracticeService self;
 
     @Transactional(readOnly = true)
     public ProgressResponse getUserProgress(UUID userId) {
@@ -96,29 +106,70 @@ public class PracticeService {
 
         // 2. Update Daily Streak
         if ("Completed".equals(request.getStatus())) {
-            updateStreakWithRetry(userId);
+            self.updateStreakWithRetry(userId);
         }
         
         return getUserProgress(userId);
     }
 
-    private void updateStreakWithRetry(UUID userId) {
+    @Transactional
+    public ProgressResponse bulkUpdateProgress(UUID userId, BulkProgressRequest request) {
+        if (request.getItems() == null || request.getItems().isEmpty()) {
+            return getUserProgress(userId);
+        }
+
+        boolean anyCompleted = false;
+        OffsetDateTime now = OffsetDateTime.now();
+
+        for (BulkProgressRequest.Item item : request.getItems()) {
+            if (item.getProblemId() == null || item.getStatus() == null) continue;
+
+            Optional<UserProgress> existing = progressRepository.findByUserIdAndProblemId(userId, item.getProblemId());
+            if (existing.isPresent()) {
+                UserProgress progress = existing.get();
+                progress.setStatus(item.getStatus());
+                progress.setUpdatedAt(now);
+                progressRepository.save(progress);
+            } else {
+                UserProgress newProgress = new UserProgress();
+                newProgress.setUserId(userId);
+                newProgress.setProblemId(item.getProblemId());
+                newProgress.setStatus(item.getStatus());
+                newProgress.setUpdatedAt(now);
+                progressRepository.save(newProgress);
+            }
+
+            if ("Completed".equals(item.getStatus())) {
+                anyCompleted = true;
+            }
+        }
+
+        // Only update streak once even if multiple problems were completed
+        if (anyCompleted) {
+            self.updateStreakWithRetry(userId);
+        }
+
+        return getUserProgress(userId);
+    }
+
+    public void updateStreakWithRetry(UUID userId) {
         final int MAX_RETRIES = 3;
         for (int attempt = 1; attempt <= MAX_RETRIES; attempt++) {
             try {
-                updateStreak(userId);
+                self.updateStreak(userId);
                 return;
             } catch (ObjectOptimisticLockingFailureException e) {
                 if (attempt == MAX_RETRIES) {
                     log.error("Failed to update streak for user {} after {} attempts", userId, MAX_RETRIES, e);
                     throw e;
                 }
-                // Retry with fresh data
+                log.warn("Optimistic lock failure for user {}, retry attempt {}/{}", userId, attempt, MAX_RETRIES);
             }
         }
     }
 
-    private void updateStreak(UUID userId) {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void updateStreak(UUID userId) {
         UserPracticeStats stats = statsRepository.findById(userId)
                 .orElse(new UserPracticeStats(userId, 0, 0, null, 0, 0));
 
