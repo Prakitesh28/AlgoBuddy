@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +35,7 @@ public class PracticeService {
     private final UserPracticeStatsRepository statsRepository;
 
     @Autowired
+    @Lazy
     private PracticeService self;
 
     @Transactional(readOnly = true)
@@ -47,7 +49,7 @@ public class PracticeService {
                 ));
 
         UserPracticeStats stats = statsRepository.findById(userId)
-                .orElse(new UserPracticeStats(userId, 0, 0, null, 0));
+                .orElse(new UserPracticeStats(userId, 0, 0, null, 0, 0));
 
         OffsetDateTime now = OffsetDateTime.now();
         OffsetDateTime startOfDay = now.toLocalDate().atStartOfDay(now.getOffset()).toOffsetDateTime();
@@ -169,7 +171,7 @@ public class PracticeService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void updateStreak(UUID userId) {
         UserPracticeStats stats = statsRepository.findById(userId)
-                .orElse(new UserPracticeStats(userId, 0, 0, null, 0));
+                .orElse(new UserPracticeStats(userId, 0, 0, null, 0, 0));
 
         LocalDate today = LocalDate.now();
         LocalDate lastActive = stats.getLastActiveDate();
