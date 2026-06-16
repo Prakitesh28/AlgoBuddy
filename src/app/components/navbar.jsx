@@ -5,8 +5,9 @@ import { useState, useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useUser } from "@/features/user/UserContext";
 import { supabase } from "@/lib/supabase";
-import { Search, Moon, Sun, Menu, X, ChevronDown, Swords, LogOut, Bell } from "lucide-react";
+import { Search, Moon, Sun, Menu, X, ChevronDown, Swords, LogOut } from "lucide-react";
 import { NAV_LINKS } from "./navLinks";
+import NotificationBell from "@/app/components/notifications/NotificationBell";
 
 function getStoredTheme() {
   if (typeof window === "undefined") return "light";
@@ -44,22 +45,11 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [theme, setTheme] = useState("light");
   const [themeMounted, setThemeMounted] = useState(false);
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
-
-  const notifications = [
-    "🔥 7 Day Streak Achieved",
-    "🎯 Goal Completed",
-    "📚 New Blog Available",
-    "🏆 Achievement Unlocked",
-    "📝 Daily Practice Challenge"
-  ];
-
   const pathname = usePathname();
   const router = useRouter();
  
   const { user, setUser } = useUser();
   const userRef = useRef(null);
-  const notificationRef = useRef(null);
 
   useEffect(() => {
     const currentTheme = getStoredTheme();
@@ -101,22 +91,6 @@ export default function Navbar() {
         !userRef.current.contains(e.target)
       ) {
         setUserMenuOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", fn);
-
-    return () =>
-      document.removeEventListener("mousedown", fn);
-  }, []);
-
-  useEffect(() => {
-    const fn = (e) => {
-      if (
-        notificationRef.current &&
-        !notificationRef.current.contains(e.target)
-      ) {
-        setNotificationsOpen(false);
       }
     };
 
@@ -226,35 +200,7 @@ export default function Navbar() {
           </div>
 
           <div className="hidden md:flex items-center gap-3">
-            <div ref={notificationRef} className="relative">
-              <button
-                onClick={() => setNotificationsOpen(!notificationsOpen)}
-                className="relative w-9 h-9 flex items-center justify-center rounded-full hover:bg-surface-100 dark:hover:bg-udemy-dark-surface"
-              >
-                <Bell className="w-5 h-5" />
-
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full px-1">
-                  {notifications.length}
-                </span>
-              </button>
-
-              {notificationsOpen && (
-                <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-udemy-dark-surface border border-surface-200 dark:border-surface-700 rounded-lg shadow-lg z-[9999]">
-                  <div className="p-3 font-semibold border-b">
-                    Notifications
-                  </div>
-
-                  {notifications.map((item, index) => (
-                    <div
-                      key={index}
-                      className="p-3 text-sm border-b last:border-b-0"
-                    >
-                      {item}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            <NotificationBell />
 
             {user ? (
               <div
