@@ -93,7 +93,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        String jwkSetUri = supabaseUrl + "/rest/v1/jwks";
+        String jwkSetUri = supabaseUrl + "/auth/v1/.well-known/jwks.json";
         return NimbusJwtDecoder.withJwkSetUri(jwkSetUri)
                 .jwsAlgorithm(org.springframework.security.oauth2.jose.jws.SignatureAlgorithm.ES256)
                 .build();

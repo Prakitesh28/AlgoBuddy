@@ -47,7 +47,7 @@ const PORT = process.env.PORT || 4000;
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
 
 const client = jwksClient({
-  jwksUri: `${SUPABASE_URL}/rest/v1/jwks`
+  jwksUri: `${SUPABASE_URL}/auth/v1/.well-known/jwks.json`
 });
 
 function getKey(header, callback){
