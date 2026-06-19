@@ -462,24 +462,71 @@ io.on("connection", async (socket) => {
         }
       }
       
-      // 2. Handle active match disconnects
+      // 2. Handle active match disconnects atomically to prevent race conditions
       const matchId = await redisClient.hget(`socket:${socket.id}`, "matchId");
       if (matchId) {
-        const matchStr = await redisClient.get(`match:${matchId}`);
-        if (matchStr) {
-          const match = JSON.parse(matchStr);
-          if (match.status !== "completed") {
-            match.status = "completed";
-            await redisClient.set(`match:${matchId}`, JSON.stringify(match));
-            
-            const opponent = match.players.find(p => p.socketId !== socket.id);
-            if (opponent) {
-              io.to(opponent.socketId).emit("opponent_disconnected", { winnerId: opponent.userId });
+        const ATOMIC_DISCONNECT_SCRIPT = `
+          local matchKey = KEYS[1]
+          local disconnectingSocketId = ARGV[1]
+          local matchStr = redis.call('GET', matchKey)
+          if not matchStr then return nil end
+          local match = cjson.decode(matchStr)
+          if match.status == 'completed' then return nil end
+          match.status = 'completed'
+          
+          local opponentUserId = nil
+          local opponentSocketId = nil
+          for i, p in ipairs(match.players) do
+            if p.socketId ~= disconnectingSocketId then
+              opponentUserId = p.userId
+              opponentSocketId = p.socketId
+            end
+          end
+          
+          if opponentUserId then
+            match.winnerId = opponentUserId
+          end
+          
+          redis.call('SET', matchKey, cjson.encode(match))
+          return cjson.encode({
+            opponentUserId = opponentUserId,
+            opponentSocketId = opponentSocketId,
+            players = match.players
+          })
+        `;
+
+        try {
+          const resultStr = await redisClient.eval(ATOMIC_DISCONNECT_SCRIPT, 1, `match:${matchId}`, socket.id);
+          if (resultStr) {
+            const result = JSON.parse(resultStr);
+            if (result.opponentSocketId) {
+              io.to(result.opponentSocketId).emit("opponent_disconnected", { winnerId: result.opponentUserId });
             }
-            
-            for (const p of match.players) {
+            for (const p of result.players) {
               await redisClient.hdel(`socket:${p.socketId}`, "matchId");
             }
+          }
+        } catch (err) {
+          // Fallback to non-atomic path if cjson is unavailable (e.g. ioredis-mock in unit tests)
+          if (err.message && err.message.includes('cjson')) {
+            const matchStr = await redisClient.get(`match:${matchId}`);
+            if (matchStr) {
+              const match = JSON.parse(matchStr);
+              if (match.status !== "completed") {
+                match.status = "completed";
+                const opponent = match.players.find(p => p.socketId !== socket.id);
+                if (opponent) {
+                  match.winnerId = opponent.userId;
+                  await redisClient.set(`match:${matchId}`, JSON.stringify(match));
+                  io.to(opponent.socketId).emit("opponent_disconnected", { winnerId: opponent.userId });
+                }
+                for (const p of match.players) {
+                  await redisClient.hdel(`socket:${p.socketId}`, "matchId");
+                }
+              }
+            }
+          } else {
+            throw err;
           }
         }
       }
