@@ -763,11 +763,46 @@ const sections = [
         ],
       },
     ],
+    },
+
+  {
+    title: "Smart Revision",
+    slug: "smart-revision",
+    desc: "Revise completed DSA topics with interactive flashcards",
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M9 12h6M12 9v6M5 5h14v14H5z"
+        />
+      </svg>
+    ),
+    info: {
+      About:
+        "Generate AI-powered flashcards from completed DSA topics and improve long-term retention using smart revision.",
+      Representation: null,
+    },
+    subsections: [
+      {
+        title: "Revision Tools",
+        items: [
+          {
+            name: "DSA Flashcards",
+            path: "/visualizer/revision-flashcards",
+          },
+        ],
+      },
+    ],
   },
 ];
-
-
-
 const Visualizer = () => {
   /* Strip non-serialisable `info` (contains JSX modals) before
      passing to the client component. Icons are fine — they're

@@ -17,6 +17,7 @@ import { useUser } from "@/features/user/UserContext";
 import { useBookmark } from "@/app/hooks/useBookmark";
 import { useProblemBookmarks } from "@/app/hooks/useProblemBookmarks";
 import { practiceData } from "@/lib/practiceData";
+import AIStudySchedule from "@/app/components/AIStudySchedule";
 
 function buildProblemIndex() {
   const index = new Map();
@@ -470,6 +471,7 @@ export default function DashboardClient() {
             </div>
           </div>
         </section>
+        <AIStudySchedule />        
       </div>
     </main>
   );
