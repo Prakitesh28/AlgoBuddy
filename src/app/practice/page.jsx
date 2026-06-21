@@ -60,7 +60,7 @@ export default function PracticePage() {
   const [isTopicLoading, setIsTopicLoading] = useState(false);
 
   // Unified progress hook (replaces all inline progress/streak logic)
-  const { progress, getStatus, updateProgress, streakData } = useSheetProgress();
+  const { progress, getStatus, updateProgress, streakData, loading: progressLoading, error: progressError } = useSheetProgress();
   const currentStreak = streakData.current;
   const longestStreak = streakData.best;
 
@@ -1058,12 +1058,27 @@ export default function PracticePage() {
                 </div>
               </div>
 
-              {filteredProblems.length === 0 ? (
+              {progressLoading ? (
+                <div className="flex flex-col items-center justify-center py-24 bg-white dark:bg-[#1a1b1e] rounded-3xl border border-slate-100 dark:border-neutral-800/80 shadow-sm transition-all duration-300">
+                  <div className="w-10 h-10 border-4 border-slate-100 border-t-emerald-500 rounded-full animate-spin dark:border-neutral-800 dark:border-t-emerald-400"></div>
+                  <p className="mt-4 text-sm font-bold text-slate-400 dark:text-neutral-500 animate-pulse">Loading recently solved problems...</p>
+                </div>
+              ) : progressError ? (
+                <div className="bg-red-50/50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-3xl p-12 text-center shadow-sm">
+                  <div className="w-16 h-16 rounded-2xl bg-red-500/10 flex items-center justify-center mx-auto mb-4">
+                    <History size={28} className="text-red-500" />
+                  </div>
+                  <h3 className="text-base font-black text-slate-800 dark:text-white mb-2">Error loading progress</h3>
+                  <p className="text-sm text-red-400 dark:text-red-500/80 max-w-sm mx-auto">
+                    {progressError}. Please refresh the page.
+                  </p>
+                </div>
+              ) : filteredProblems.length === 0 ? (
                 <div className="bg-white dark:bg-[#1a1b1e] border border-slate-100 dark:border-neutral-800/80 rounded-3xl p-12 text-center shadow-sm">
                   <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
                     <History size={28} className="text-emerald-500" />
                   </div>
-                  <h3 className="text-base font-black text-slate-800 dark:text-white mb-2">No solved problems yet</h3>
+                  <h3 className="text-base font-black text-slate-800 dark:text-white mb-2">No recently solved problems yet.</h3>
                   <p className="text-sm text-slate-400 dark:text-neutral-500 max-w-sm mx-auto">
                     Your completed problems will appear here. Start practicing!
                   </p>
@@ -1076,6 +1091,7 @@ export default function PracticePage() {
                         <tr className="bg-slate-50/40 dark:bg-neutral-900/10 text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-neutral-500 border-b border-slate-100 dark:border-neutral-800">
                           <th className="py-4 px-5 w-12 text-center">#</th>
                           <th className="py-4 px-5">Problem</th>
+                          <th className="py-4 px-5 text-center">Topic</th>
                           <th className="py-4 px-5 text-center">Level</th>
                           <th className="py-4 px-5 text-center">Completed On</th>
                           <th className="py-4 px-5 text-center">Status</th>
@@ -1094,6 +1110,9 @@ export default function PracticePage() {
                                   <span>{prob.name}</span>
                                   <ExternalLink size={12} className="opacity-50 shrink-0" />
                                 </a>
+                              </td>
+                              <td className="py-4 px-5 text-center text-xs font-bold text-slate-500 dark:text-neutral-400">
+                                {prob.topic}
                               </td>
                               <td className="py-4 px-5 text-center">
                                 <span className={`inline-block text-[9px] font-black px-2.5 py-0.5 rounded-full ${
